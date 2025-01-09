@@ -11,7 +11,7 @@ This repository contains Podman configurations for running DreamFactory with MyS
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/df-podman.git
+git clone https://github.com/funkytaco/dreamfactory-podman.git
 cd df-podman
 ```
 
