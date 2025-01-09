@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:latest
+    volumes:
+      - df-redis:/data
+    networks:
+      - dreamfactory
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - df-mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=dreamfactory
+      - MYSQL_USER=df_admin
+      - MYSQL_PASSWORD=df_admin
+    networks:
+      - dreamfactory
+
+  postgres:
+    image: postgres:13
+    volumes:
+      - df-postgres:/var/lib/postgresql/data
+      - ./data/dellstore.sql:/docker-entrypoint-initdb.d/dellstore.sql:ro
+    environment:
+      - POSTGRES_PASSWORD=root_pw
+      - POSTGRES_DB=dellstore
+    networks:
+      - dreamfactory
+
+  web:
+    build: .
+    depends_on:
+      - mysql
+      - redis
+      - postgres
+    volumes:
+      - df-storage:/opt/dreamfactory/storage
+    environment:
+      - APP_KEY='INSERT_APP_KEY_HERE'
+      - DB_HOST=mysql
+      - DB_USERNAME=df_admin
+      - DB_PASSWORD=df_admin
+      - DB_DATABASE=dreamfactory
+      - REDIS_HOST=redis
+      - CACHE_DRIVER=redis
+      - QUEUE_DRIVER=redis
+    ports:
+      - "80:80"
+    networks:
+      - dreamfactory
+
+networks:
+  dreamfactory:
+    driver: bridge
+
+volumes:
+  df-storage:
+  df-mysql:
+  df-redis:
+  df-postgres:
